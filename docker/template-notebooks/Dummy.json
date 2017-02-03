@@ -1,0 +1,59 @@
+﻿{
+  "paragraphs": [
+    {
+      "text": "%md\n\nDummy",
+      "dateUpdated": "2016-09-02T15:06:57+0000",
+      "config": {
+        "colWidth": 12,
+        "graph": {
+          "mode": "table",
+          "height": 300,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {},
+          "map": {
+            "baseMapType": "Streets",
+            "isOnline": true,
+            "pinCols": []
+          }
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1472828817375_74697590",
+      "id": "20160902-150657_939177841",
+      "dateCreated": "2016-09-02T15:06:57+0000",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500,
+      "focus": true,
+      "$$hashKey": "object:151"
+    }
+  ],
+  "name": "Configuration",
+  "id": "2BX7FRD5T",
+  "lastReplName": {
+    "value": "spark"
+  },
+  "angularObjects": {
+    "2BVFXG2XM:shared_process": [],
+    "2BTQDSVT4:shared_process": [],
+    "2BW43QW5B:shared_process": [],
+    "2BX9YZ6T9:shared_process": [],
+    "2BV5ASP6R:shared_process": [],
+    "2BXN329FH:shared_process": [],
+    "2BTZVXPEV:shared_process": [],
+    "2BTRYH4TM:shared_process": [],
+    "2BWEDMGST:shared_process": []
+  },
+  "config": {
+    "looknfeel": "default"
+  },
+  "info": {}
+}

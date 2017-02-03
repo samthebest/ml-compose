@@ -1,0 +1,15 @@
+
+.idea*
+project/target*
+project/project*
+target*
+
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
+
+docker/*-assembly.jar
+
+docker/notebooks/*
+
