@@ -7,6 +7,9 @@ trait PartitionedKeyedMultisetOps[M[_, _]] {
   // want to go lower level.
   def groupByKey[K: Serialiser, V: Serialiser](partitionedKeyedMultiset: M[K, V]): M[K, Iterable[V]]
 
+  // May want to consider a KeyValueSerialiser[K, V] rather than two separate ones, again gives more scope for optimisation, 
+  // especially for joins.  We often don't need to wrap in a Tuple.
+
   // etc, Can do most things with `combineByKey`
 }
 
@@ -31,6 +34,9 @@ trait PartitionedMultisetOps[M[_]] {
 
   def cache[T: Serialiser](partitionedMultiset: M[T]): M[T]
   // etc
+
+  // If we implement this, then everything else can be implemented in terms of it.
+  def mapPartitionsWithIndex
 
 
   def autoGenerateOptimisedSerialiser[T](data: M[T]): Serialiser[T]
