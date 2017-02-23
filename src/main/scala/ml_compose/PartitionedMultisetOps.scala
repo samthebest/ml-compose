@@ -5,7 +5,8 @@ trait PartitionedKeyedMultisetOps[M[_, _]] {
   // For RDD we can use the Serialisers to produce WrappedArray, which will be
   // pretty close to Dataset / Dataframe impl assuming the Serialisers provided are good.  Perhaps some day we will
   // want to go lower level.
-  def groupByKey[K: Serialiser, V: Serialiser](partitionedKeyedMultiset: M[K, V]): M[K, Iterable[V]]
+  def groupByKey[K, V](partitionedKeyedMultiset: M[K, V])
+                      (implicit keyValueSerialiser: KeyValueSerialiser[K, V]): M[K, Iterable[V]]
 
   // May want to consider a KeyValueSerialiser[K, V] rather than two separate ones, again gives more scope for optimisation, 
   // especially for joins.  We often don't need to wrap in a Tuple.
@@ -20,7 +21,8 @@ trait PartitionedMultisetOps[M[_]] {
   // Observe we don't need Serialisers for T & U here, this is vastly better than Dataset already :)
   def map[T, U, ClosureContext: Serialiser](f: (T, ClosureContext) => U)
                                            (partitionedMultiset: M[T])
-                                           (implicit context: ClosureContext): M[U]
+                                           (implicit context: ClosureContext): M[U] =
+    mapPartitionsWithIndex((it, i, closure) => it.map(f(_, closure)))
 
   // ....  so idea with the "Context" is when we call RDD.map we wrap `f` in a `spore`, which will give us a compile
   // time error if f calls anything outside of `Context`, then we must ensure `Context` has an explicit Serialiser.
@@ -35,8 +37,10 @@ trait PartitionedMultisetOps[M[_]] {
   def cache[T: Serialiser](partitionedMultiset: M[T]): M[T]
   // etc
 
-  // If we implement this, then everything else can be implemented in terms of it.
-  def mapPartitionsWithIndex
+  // If we implement this, then most other things can be implemented in terms of it.
+  def mapPartitionsWithIndex[T, U, ClosureContext: Serialiser](f: (Iterator[T], Int, ClosureContext) => Iterator[U])
+                                                              (partitionedMultiset: M[T])
+                                                              (implicit context: ClosureContext): M[U]
 
 
   def autoGenerateOptimisedSerialiser[T](data: M[T]): Serialiser[T]
@@ -76,6 +80,13 @@ trait Serialiser[T] {
   // Override for more complex stateful serialisers
   def serialiseSelf: Array[Byte] = this.getClass().getCanonicalName().toCharArray.map(_.toByte)
   def deserialiseSelf: this.type = ??? // some sort of ugly reflection magic
+}
+
+trait KeyValueSerialiser[K, V] {
+  def serialiseOne(k: K, v: V): Array[Byte]
+  def deserialiseKey(a: Array[Byte]): K
+  def deserialiseValue(a: Array[Byte]): V
+  def deserialiseOne(a: Array[Byte]): (K, V)
 }
 
 object OurLibrary {
