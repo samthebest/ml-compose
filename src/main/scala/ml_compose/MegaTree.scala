@@ -7,6 +7,6 @@ trait MegaTreeOps {
       megaTree: MegaTree)(
       implicit context: ClosureContext): MegaTree
 
-
+// will need a ton of settings regarding partition sizes
 
 }
