@@ -23,6 +23,7 @@ trait PartitionedKeyedMultisetOps[M[_, _]] {
                                              combine: Array[Byte] => Array[Byte])
                                             (implicit keyValueSerialiser: KeyValueSerialiser[K, V]): M[K, V]
 
+  // TODO Consider Tree like ones
 
   // Plus all the operations one would expect: mapValues, mapKeys, map, etc, etc
 }
