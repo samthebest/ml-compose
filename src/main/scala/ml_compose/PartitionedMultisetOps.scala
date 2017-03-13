@@ -8,10 +8,23 @@ trait PartitionedKeyedMultisetOps[M[_, _]] {
   def groupByKey[K, V](partitionedKeyedMultiset: M[K, V])
                       (implicit keyValueSerialiser: KeyValueSerialiser[K, V]): M[K, Iterable[V]]
 
-  // May want to consider a KeyValueSerialiser[K, V] rather than two separate ones, again gives more scope for optimisation, 
-  // especially for joins.  We often don't need to wrap in a Tuple.
-
   // etc, Can do most things with `combineByKey`
+
+  // Assumes Op is associative in the partition order.
+  def combineByKey[K, V](partitionedKeyedMultiset: M[K, V],
+                         combine: Iterator[V] => V)
+                        (implicit keyValueSerialiser: KeyValueSerialiser[K, V]): M[K, V]
+
+  def combineSerialisedByKey[K, V](partitionedKeyedMultiset: M[K, V],
+                                   combine: Array[Byte] => V)
+                                  (implicit keyValueSerialiser: KeyValueSerialiser[K, V]): M[K, V]
+
+  def combineSerialisedByKeySerialised[K, V](partitionedKeyedMultiset: M[K, V],
+                                             combine: Array[Byte] => Array[Byte])
+                                            (implicit keyValueSerialiser: KeyValueSerialiser[K, V]): M[K, V]
+
+
+  // Plus all the operations one would expect: mapValues, mapKeys, map, etc, etc
 }
 
 
@@ -61,6 +74,8 @@ trait Serialiser[T] {
   def serialiseMany(t: Array[T]): Array[Byte] = ???
   def deserialiseMany(a: Array[Byte]): Array[T] = ???
 
+  def appendOne(t: T, cur: Array[Byte]): Array[Byte]
+
   // etc ... more may be necessary for optimisations, e.g. `def countSerialisedMany(a: Array[Byte]): Long`
   // this way we can optimise code to not desrialise for operations like `count`
   // e.g. `def headFromSerialisedMany(a: Array[Byte]): T`, `def lazyDeserialiseMany(a: Array[Byte]): Iterator[T]`, etc
@@ -87,6 +102,7 @@ trait KeyValueSerialiser[K, V] {
   def deserialiseKey(a: Array[Byte]): K
   def deserialiseValue(a: Array[Byte]): V
   def deserialiseOne(a: Array[Byte]): (K, V)
+  def unzip(a: Array[Byte]): (Array[Byte], Array[Byte])
 }
 
 object OurLibrary {
