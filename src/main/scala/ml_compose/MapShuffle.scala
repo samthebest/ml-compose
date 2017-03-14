@@ -13,22 +13,22 @@ trait MapShuffle[M[_, _] {
   // Note f is entirely responsible for serialisation and keeping track of what is and isn't serialised
   def mapPartitions[PIn, POut, C](f: (Iterator[Byte], PIn, Iterator[Byte], C) => (Iterator[Byte], POut, Iterator[Byte], C),
                                   closure: Iterator[Byte],
-                                  m: M[PIn, C],
-                                  settings: Settings): M[POut, C]
+                                  m: M[PIn, C]): M[POut, C]
 
-
-  
-  
+  // settings control how many output partitions, and potentially other stuff.
   // If retainClosure = true, and M re-uses processes, then the Closure is preserved, and so the returned M if chained with
-  // another operation can re-use the Closure
-  def shuffle[Pin, C](f: (Iterator[Byte], Pin, Iterator[Byte], C) => Iterator[(Long, Iterator[Byte])],
+  // another operation can re-use the Closure. This logic might get confusing if the number of output partitions differs.
+  def shuffle[Pin, C](f: (Iterator[Byte], Pin, Iterator[Byte], C) => (Iterator[(Long, Iterator[Byte])], Iterator[Byte], C),
                       closure: Iterator[Byte],
                       retainClosure: Boolean,
                       m: M[Pin, C],
                       settings: Settings): M[_, C]
   
   
-  def read[P](reader: Reader[P]): M[P, _]
+  def read[P](reader: Reader[P], settings: Settings): M[P, _]
+
+  def readAndCache[P](reader: Reader[P], settings: Settings): M[P, _]
+
   def write[P](writer: Writer[P], M[P, _]): Unit
   // TODO details
   def collect[P, T](collecter: Collecter[P, T], M[P, _]): T
@@ -57,7 +57,29 @@ trait MapShuffle[M[_, _] {
   // (even where that method could easily be thought of as static) still requires the whole class to be serialised. This
   // plus OOP creates hellish programs.
   
-  
-                                  
+
+  // # Caching
+
+  // Note the `f` can even encapsulate cacheing for the mapPartitions.  The returned Iterator could be backed by some
+  // Array (rather than being lazy), so if multiple operations are performed on the returned M[P, C] they could just be
+  // reusing an in-memory thing rather than recomputing lazily.
+
+  // It also means subsequent functions can be responsible for the freeing of cached data too, 
+  // and therefore optimise how it's done (lazily vs non-lazily).
+
+  // A shuffle will likely mean any caching is lost (since the returned data is just bytes and Long keys).  After a shuffle
+  // A trivial mapPartitions could be done to add caching.
+
+
+  // Node Closures / Broadcast State Machines
+
+  // If Hadean had a Broadcast variable, this could abstract away a lot of nice things like:
+  // - big lookups that exist once per node
+  // - operations that ought to be done once per node
+  // - monoidal aggregation (e.g. counting data at the same time as mapping it)
+
+  // then in order to avoid making the mapPartitions interface any more complex, 
+  // I assume a pointer to a broadcast-state-machine could be included in the Clojure.
+
                                   
 }
