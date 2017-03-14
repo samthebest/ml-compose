@@ -1,4 +1,5 @@
 
+// Question: Are Hadean processes disjoint in their memory space? Any way we can share memory across processes?
 
 trait MapShuffle[M[_, _] {
   // P is a type for a deserialised parition, e.g. Iterator[String]
