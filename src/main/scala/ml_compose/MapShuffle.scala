@@ -1,6 +1,6 @@
 
-// RMSW
-trait ReadMapShuffleNWrite[M[_, _] {
+
+trait MapShuffle[M[_, _] {
   // P is a type for a deserialised parition, e.g. Iterator[String]
   // f takes (serialised raw data, deserialised objects, serialised raw closure, deserialised closure)
   // We optionally return the closure to allow down downstream processes to re-use it
@@ -24,6 +24,8 @@ trait ReadMapShuffleNWrite[M[_, _] {
   
   def read[P](reader: Reader[P]): M[P, _]
   def write[P](writer: Writer[P], M[P, _]): Unit
+  // TODO details
+  def collect[P, T](collecter: Collecter[P, T], M[P, _]): T
   
   
   // So we should think of the Closure as the internal state of the partition processors. 
