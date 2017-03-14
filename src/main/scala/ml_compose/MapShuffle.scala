@@ -9,7 +9,8 @@ trait MapShuffle[M[_, _] {
   // Note f is entirely responsible for serialisation and keeping track of what is and isn't serialised
   def mapPartitions[PIn, POut, C](f: (Iterator[Byte], PIn, Iterator[Byte], C) => (Iterator[Byte], POut, Iterator[Byte], C),
                                   closure: Iterator[Byte],
-                                  m: M[PIn, C]): M[POut, C]
+                                  m: M[PIn, C],
+                                  settings: Settings): M[POut, C]
 
 
   
@@ -19,7 +20,8 @@ trait MapShuffle[M[_, _] {
   def shuffle[Pin, C](f: (Iterator[Byte], Pin, Iterator[Byte], C) => Iterator[(Long, Iterator[Byte])],
                       closure: Iterator[Byte],
                       retainClosure: Boolean,
-                      m: M[Pin, C]): M[_, C]
+                      m: M[Pin, C],
+                      settings: Settings): M[_, C]
   
   
   def read[P](reader: Reader[P]): M[P, _]
