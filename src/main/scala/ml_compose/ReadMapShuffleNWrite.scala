@@ -1,6 +1,6 @@
 
 // RMSW
-trait ReadMapShuffleWrite[M[_, _] {
+trait ReadMapShuffleNWrite[M[_, _] {
   // P is a type for a deserialised parition, e.g. Iterator[String]
   // f takes (serialised raw data, deserialised objects, serialised raw closure, deserialised closure)
   // We optionally return the closure to allow down downstream processes to re-use it
