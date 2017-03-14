@@ -1,6 +1,9 @@
 
 // Question: Are Hadean processes disjoint in their memory space? Any way we can share memory across processes?
 
+// Because we may want to include a Node level concept of a Closure (like a BV in spark), except more general (so can
+// allow things like exeucting something once on each node).
+
 trait MapShuffle[M[_, _] {
   // P is a type for a deserialised parition, e.g. Iterator[String]
   // f takes (serialised raw data, deserialised objects, serialised raw closure, deserialised closure)
