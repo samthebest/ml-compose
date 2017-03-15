@@ -81,5 +81,18 @@ trait MapShuffle[M[_, _] {
   // then in order to avoid making the mapPartitions interface any more complex, 
   // I assume a pointer to a broadcast-state-machine could be included in the Clojure.
 
+
+  // The returned `Long` is an ID for the broadcasted type T that can be serialised and used inside a Clojure
+  def broadcast[T](t: T, serialise: T => Iterator[Byte]): Long
+
+  // This should memoise - i.e. when called once the BV is deserialised, the next times it just returns the already 
+  // serialised pointer
+  def getBroadcast[T](l: Long, deserialise: Iterator[Byte] => T): T
+
+  // if you want to perform an operation once at the node level on each BV, can use this.  It assumes you have called
+  // getBroadcast at least once, and note you do not need serialisers/deserialisers for U since it's already in the memory
+  // on the node
+  def mapBroadcast[T, U](l: Long, f: T => U): Long
+
                                   
 }
